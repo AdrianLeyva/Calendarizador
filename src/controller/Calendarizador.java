@@ -20,7 +20,8 @@ public class Calendarizador {
     }
     
     public void execute(){
-        FCFS.execute(lista);
+        FCFS fcfs = new FCFS(lista);
+        fcfs.execute();
     }
     
 }

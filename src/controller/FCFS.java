@@ -14,84 +14,93 @@ import model.Proceso;
  * @author adrianaldairleyvasanchez
  */
 public class FCFS {
-
-    public FCFS() {
+    private ArrayList<Proceso> processesList;
+    private boolean isCPURunning;
+    private Stack readyStack;
+    private Stack finishedStack;
+    private Proceso currentProcess;
+    private int listSize;
+    private int timer;
+    
+    public FCFS(ArrayList<Proceso> processesList) {
+        this.processesList = processesList;
+        this.isCPURunning = false;
+        this.readyStack = new Stack();
+        this.finishedStack = new Stack();
+        this.currentProcess = null;
+        this.listSize = this.processesList.size();
+        this.timer = 0;
     }
     
-    //Algoritmo First-come First-served
-    public static Stack execute(ArrayList<Proceso> lista){
-       boolean isCPURunning = false;
-       Stack pilaListos = new Stack();
-       Stack pilaFinalizados = new Stack();
-       Proceso procesoActual = null;
-       
-       BubbleSort.sort(lista);
-       
-       for(int i=0;pilaFinalizados.size() != lista.size();i++){
-           
-            Proceso proceso = getProcessComing(lista, i);
-            
-            if(isCPURunning){
-                
-                if(proceso!=null)
-                    pilaListos.push(proceso);
-                
-                procesoActual.setTiempoTotal(i - procesoActual.getTiempoLlegada());
-                if(procesoActual.getRafaga() == (procesoActual.getTiempoTotal() - procesoActual.getTiempoEspera())){
-                    pilaFinalizados.push(procesoActual);
-                    isCPURunning = false;
-                }
-                     
-                
-            }else{
-                
-                if(pilaListos.isEmpty()){
-                    
-                    if(proceso!=null){
-                        procesoActual = proceso;
-                        procesoActual.setTiempoEspera(i - procesoActual.getTiempoLlegada());
-                        isCPURunning = true;
-                        //i--;
-                    }
-                    
-                }else{
-                    
-                    if(proceso!=null)
-                        pilaListos.push(proceso);
-                    
-                
-                    System.out.println(procesoActual.toString());
-                    procesoActual = (Proceso)pilaListos.pop();
-                    isCPURunning = true;
-                    //i--;
-                }
-                
-            }
-           
+    public void execute(){
+        while(this.finishedStack.size() != this.listSize){
+            addNewProcess();
+            runCPU();
         }
-       
-        printLog(pilaFinalizados);
-       
-       return pilaFinalizados;      
+        printFinishedStack();
+        printTimer();
     }
     
-    //Verifica si ha llegado un nuevo proceso
-    private static Proceso getProcessComing(ArrayList<Proceso> lista, int time){
-        Proceso proceso = null;
-        for(int i=0;i<lista.size();i++){
-            if(lista.get(i).getTiempoLlegada() == time){
-                proceso = lista.get(i);
+    
+    //Valida procesos entrantes y los agrega a la pila de listos si no son nulos.
+    private void addNewProcess(){
+        Proceso process = getProcessComing();
+        
+        if(process!=null){
+            this.readyStack.push(process);
+        }
+    }
+    
+    private void runCPU(){
+        if(!this.isCPURunning){
+            this.currentProcess = (Proceso)this.readyStack.firstElement();
+            this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
+            this.readyStack.remove(0);
+            this.isCPURunning = true;
+        }else{
+            this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());
+            
+            double dinamicRafaja = ((this.currentProcess.getTiempoTotal()) - 
+                                     this.currentProcess.getTiempoEspera());
+        
+            if(this.currentProcess.getRafaga() == dinamicRafaja){
+                this.finishedStack.push(this.currentProcess);
+                this.isCPURunning = false;
+                this.timer--;
+            }
+            
+            
+            this.timer++;
+            
+            
+        }
+        
+    }
+    
+    
+    //Verifica si ha llegado un nuevo proceso.
+    private Proceso getProcessComing(){
+        Proceso process = null;
+        for(int i=0;i<this.processesList.size();i++){
+            if(this.processesList.get(i).getTiempoLlegada() == this.timer){
+                process = this.processesList.get(i);
+                this.processesList.remove(i);
                 break;
             }
         }
-        return proceso;
+        return process;
     }
     
-    private static void printLog(Stack stack){
-        int limit = stack.size();
+    private void printFinishedStack(){
+        int limit = this.finishedStack.size();
         for(int i=0;i<limit;i++){
-            Proceso proceso = (Proceso)stack.pop();
+            Proceso proceso = (Proceso)this.finishedStack.pop();
             System.out.println(proceso.toString());
         }
     }
+    
+    private void printTimer(){
+        System.out.println("El tiempo total de ejecución es: " + this.timer);
+    }
+    
 }
