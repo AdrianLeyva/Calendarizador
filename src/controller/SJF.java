@@ -13,7 +13,7 @@ import model.Proceso;
  *
  * @author adrianaldairleyvasanchez
  */
-public class FCFS {
+public class SJF {
     private ArrayList<Proceso> processesList;
     private boolean isCPURunning;
     private Stack readyStack;
@@ -22,7 +22,7 @@ public class FCFS {
     private int listSize;
     private int timer;
     
-    public FCFS(ArrayList<Proceso> processesList) {
+    public SJF(ArrayList<Proceso> processesList) {
         this.processesList = processesList;
         this.isCPURunning = false;
         this.readyStack = new Stack();
@@ -33,7 +33,6 @@ public class FCFS {
     }
     
     public void execute(){
-        sortProcessesList();
         
         while(this.finishedStack.size() != this.listSize){
             addNewProcess();
@@ -56,6 +55,7 @@ public class FCFS {
     
     private void runCPU(){
         if(!this.isCPURunning){
+            sortReadyStack();
             this.currentProcess = (Proceso)this.readyStack.firstElement();
             this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
             this.readyStack.remove(0);
@@ -93,19 +93,46 @@ public class FCFS {
         return process;
     }
     
-    private void sortProcessesList(){
+    private void sortReadyStack(){
+        
         Proceso buffer;
         int i,j;
-        for(i = 0; i < processesList.size(); i++){
+        for(i = 0; i < readyStack.size(); i++){
             for(j = 0; j < i; j++){
-                if(processesList.get(i).getTiempoLlegada() < processesList.get(j).getTiempoLlegada())
+                if(((Proceso)readyStack.get(i)).getRafaga()< ((Proceso)readyStack.get(j)).getRafaga())
                 {
-                    buffer = processesList.get(j);
-                    processesList.set(j, processesList.get(i));
-                    processesList.set(i, buffer);
+                    buffer = (Proceso)readyStack.get(j);
+                    readyStack.set(j, readyStack.get(i));
+                    readyStack.set(i, buffer);
                 }
             }
-        }      
+        }     
+        /*
+        
+        ArrayList<Proceso> list = new ArrayList<>();
+        Proceso buffer;
+        int i,j;
+        
+        while(!readyStack.empty()){
+            list.add((Proceso)readyStack.pop());
+        }
+        
+        
+        for(i = 0; i < list.size(); i++){
+            for(j = 0; j < i; j++){
+                if(((Proceso)list.get(i)).getRafaga() < ((Proceso)list.get(j)).getRafaga())
+                {
+                    buffer = (Proceso)list.get(j);
+                    list.set(j, list.get(i));
+                    list.set(i, buffer);
+                }
+            }
+        }
+        
+        for(i = 0;i<list.size();i++){
+            readyStack.push(list.get(i));
+        }
+                */
     }
     
     private void printFinishedStack(){
@@ -119,5 +146,4 @@ public class FCFS {
     private void printTimer(){
         System.out.println("El tiempo total de ejecución es: " + this.timer);
     }
-    
 }

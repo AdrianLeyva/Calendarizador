@@ -19,9 +19,14 @@ public class Calendarizador {
         this.lista = lista;
     }
     
-    public void execute(){
+    public void executeFCFS(){
         FCFS fcfs = new FCFS(lista);
         fcfs.execute();
+    }
+    
+    public void executeSJF(){
+        SJF sjf = new SJF(lista);
+        sjf.execute();
     }
     
 }
