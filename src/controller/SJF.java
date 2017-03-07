@@ -107,32 +107,6 @@ public class SJF {
                 }
             }
         }     
-        /*
-        
-        ArrayList<Proceso> list = new ArrayList<>();
-        Proceso buffer;
-        int i,j;
-        
-        while(!readyStack.empty()){
-            list.add((Proceso)readyStack.pop());
-        }
-        
-        
-        for(i = 0; i < list.size(); i++){
-            for(j = 0; j < i; j++){
-                if(((Proceso)list.get(i)).getRafaga() < ((Proceso)list.get(j)).getRafaga())
-                {
-                    buffer = (Proceso)list.get(j);
-                    list.set(j, list.get(i));
-                    list.set(i, buffer);
-                }
-            }
-        }
-        
-        for(i = 0;i<list.size();i++){
-            readyStack.push(list.get(i));
-        }
-                */
     }
     
     private void printFinishedStack(){
