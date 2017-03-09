@@ -19,6 +19,7 @@ public class Proceso {
     private int prioridad;
     private double tiempoEspera;
     private double tiempoTotal;
+    private double tiempoRestante;
     private String estado;
 
     public Proceso(String nombre, double tiempoLlegada, double rafaga, int prioridad, String estado) {
@@ -29,6 +30,7 @@ public class Proceso {
         this.estado = estado;
         this.tiempoEspera = 0;
         this.tiempoTotal = 0;
+        this.tiempoRestante = this.rafaga;
     }
 
     public String getNombre() {
@@ -85,6 +87,14 @@ public class Proceso {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public double getTiempoRestante() {
+        return tiempoRestante;
+    }
+
+    public void setTiempoRestante(double tiempoRestante) {
+        this.tiempoRestante = tiempoRestante;
     }
 
     @Override

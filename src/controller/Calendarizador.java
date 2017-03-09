@@ -29,4 +29,9 @@ public class Calendarizador {
         sjf.execute();
     }
     
+    public void executeSRTF(){
+        SRTF srtf = new SRTF(lista);
+        srtf.execute();
+    }
+    
 }
