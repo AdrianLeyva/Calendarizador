@@ -23,6 +23,7 @@ public class RoundRobin {
     private int timer;
     private int quantum;
     
+    
     public RoundRobin(ArrayList<Proceso> processesList, int quantum) {
         this.processesList = processesList;
         this.isCPURunning = false;
@@ -31,7 +32,7 @@ public class RoundRobin {
         this.currentProcess = null;
         this.listSize = this.processesList.size();
         this.timer = 0;
-        this.quantum = quantum;
+        this.quantum = 0;
     }
     
     public void execute(){
@@ -57,11 +58,19 @@ public class RoundRobin {
     }
     
     private void runCPU(){
+        
+        Queue queueProcess = new LinkedList();
+        
         if(!this.isCPURunning){
-            this.currentProcess = (Proceso)this.readyStack.firstElement();
-            this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
-            this.readyStack.remove(0);
-            this.isCPURunning = true;
+            queueProcess.add(this.currentProcess);
+            if(this.quantum == 8){
+                this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
+                queueProcess.remove();
+                queueProcess.add(this.currentProcess);
+                this.isCPURunning = true;
+                this.quantum = 0;
+            }
+            
         }else{
             this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());
             
@@ -73,7 +82,7 @@ public class RoundRobin {
                 this.timer--;
             }
             
-            
+            this.quantum++;
             this.timer++;
             
             
