@@ -23,6 +23,7 @@ class RoundRobin {
     private int timer;
     private int quantum;
     private int countQuantum = 0;
+    Queue<Proceso> cola = new LinkedList();
     
     public RoundRobin(ArrayList<Proceso> processesList, int quantum) {
         this.processesList = processesList;
@@ -73,7 +74,7 @@ class RoundRobin {
             this.currentProcess = (Proceso)this.readyStack.firstElement();
             this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
             this.readyStack.remove(0);
-            this.isCPURunning = true;
+            this.isCPURunning = true;          
         }else{
             if (countQuantum == getQuantum()) {
                 quantumChange();
@@ -101,8 +102,6 @@ class RoundRobin {
     private void quantumChange(){
         
         Proceso aux;
-        
-        
         
         countQuantum = 0;
     }
