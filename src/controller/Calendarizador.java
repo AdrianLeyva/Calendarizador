@@ -34,4 +34,9 @@ public class Calendarizador {
         srtf.execute();
     }
     
+    public void executeRoundRobin(int quantum){
+        RoundRobin rr = new RoundRobin(lista, quantum);
+        rr.execute();
+    }
+    
 }
