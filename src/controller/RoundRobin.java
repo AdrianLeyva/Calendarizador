@@ -12,8 +12,7 @@ import model.*;
  *
  * @author Armando Carvajal
  */
-class RoundRobin {
-
+public class RoundRobin {
     private ArrayList<Proceso> processesList;
     private boolean isCPURunning;
     private Stack readyStack;
@@ -22,7 +21,6 @@ class RoundRobin {
     private int listSize;
     private int timer;
     private int quantum;
-    private int countQuantum = 0;
     
     public RoundRobin(ArrayList<Proceso> processesList, int quantum) {
         this.processesList = processesList;
@@ -34,16 +32,6 @@ class RoundRobin {
         this.timer = 0;
         this.quantum = quantum;
     }
-
-    public int getQuantum() {
-        return quantum;
-    }
-
-    public void setQuantum(int quantum) {
-        this.quantum = quantum;
-    }
-    
-    
     
     public void execute(){
         sortProcessesList();
@@ -68,21 +56,17 @@ class RoundRobin {
     }
     
     private void runCPU(){
-        
         if(!this.isCPURunning){
             this.currentProcess = (Proceso)this.readyStack.firstElement();
             this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
             this.readyStack.remove(0);
             this.isCPURunning = true;
         }else{
-            if (countQuantum == getQuantum()) {
-                quantumChange();
-            }else{             
             this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());
             
-            double dinamicRafaga = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
+            double dinamicRafaja = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
         
-            if(this.currentProcess.getRafaga() == dinamicRafaga){
+            if(this.currentProcess.getRafaga() == dinamicRafaja){
                 this.finishedStack.push(this.currentProcess);
                 this.isCPURunning = false;
                 this.timer--;
@@ -90,21 +74,10 @@ class RoundRobin {
             
             
             this.timer++;
-            countQuantum++;
-            }
+            
             
         }
         
-    }
-    
-    
-    private void quantumChange(){
-        
-        Proceso aux;
-        
-        
-        
-        countQuantum = 0;
     }
     
     
@@ -147,4 +120,5 @@ class RoundRobin {
     private void printTimer(){
         System.out.println("El tiempo total de ejecución es: " + this.timer);
     }
+    
 }
