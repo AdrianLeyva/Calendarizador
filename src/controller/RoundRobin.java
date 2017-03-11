@@ -15,23 +15,35 @@ import model.*;
 public class RoundRobin {
     private ArrayList<Proceso> processesList;
     private boolean isCPURunning;
-    private Stack readyStack;
-    private Stack finishedStack;
+    private Queue readyStack;
+    private Queue finishedStack;
     private Proceso currentProcess;
     private int listSize;
     private int timer;
     private int quantum;
+    private int counterQuantum;
     
     public RoundRobin(ArrayList<Proceso> processesList, int quantum) {
         this.processesList = processesList;
         this.isCPURunning = false;
-        this.readyStack = new Stack();
-        this.finishedStack = new Stack();
+        this.readyStack = new LinkedList();
+        this.finishedStack = new LinkedList();
         this.currentProcess = null;
         this.listSize = this.processesList.size();
         this.timer = 0;
         this.quantum = quantum;
+        this.counterQuantum = 0;
     }
+
+    public int getQuantum() {
+        return quantum;
+    }
+
+    public void setQuantum(int quantum) {
+        this.quantum = quantum;
+    }
+    
+    
     
     public void execute(){
         sortProcessesList();
@@ -51,15 +63,15 @@ public class RoundRobin {
         Proceso process = getProcessComing();
         
         if(process!=null){
-            this.readyStack.push(process);
+            this.readyStack.add(process);
         }
     }
     
     private void runCPU(){
         if(!this.isCPURunning){
-            this.currentProcess = (Proceso)this.readyStack.firstElement();
+            this.currentProcess = (Proceso)this.readyStack.element();
             this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
-            this.readyStack.remove(0);
+            this.readyStack.poll();
             this.isCPURunning = true;
         }else{
             this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());
@@ -67,15 +79,14 @@ public class RoundRobin {
             double dinamicRafaja = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
         
             if(this.currentProcess.getRafaga() == dinamicRafaja){
-                this.finishedStack.push(this.currentProcess);
+                this.finishedStack.add(this.currentProcess);
                 this.isCPURunning = false;
                 this.timer--;
-            }
-            
+            }            
             
             this.timer++;
-            
-            
+            counterQuantum++;
+                    
         }
         
     }
@@ -112,7 +123,7 @@ public class RoundRobin {
     private void printFinishedStack(){
         int limit = this.finishedStack.size();
         for(int i=0;i<limit;i++){
-            Proceso proceso = (Proceso)this.finishedStack.pop();
+            Proceso proceso = (Proceso)this.finishedStack.poll();
             System.out.println(proceso.toString());
         }
     }
