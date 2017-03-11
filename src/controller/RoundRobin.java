@@ -12,123 +12,94 @@ import model.*;
  *
  * @author Armando Carvajal
  */
-public class RoundRobin {
-    
-    private ArrayList<Proceso> processesList;
-    private boolean isCPURunning;
-    private Stack readyStack;
-    private Stack finishedStack;
-    private Proceso currentProcess;
-    private int listSize;
-    private int timer;
-    private int quantum;
-    
-    
-    public RoundRobin(ArrayList<Proceso> processesList, int quantum) {
-        this.processesList = processesList;
-        this.isCPURunning = false;
-        this.readyStack = new Stack();
-        this.finishedStack = new Stack();
-        this.currentProcess = null;
-        this.listSize = this.processesList.size();
-        this.timer = 0;
-        this.quantum = 0;
+class RoundRobin {
+
+    ArrayList<Proceso> cola;
+    int i = 0;
+    int quantum;
+    Proceso process;
+
+    public RoundRobin(ArrayList cola, int quantum) {
+        this.cola = cola;
+        this.quantum = quantum;
+    }
+
+    public int getQuantum() {
+        return quantum;
+    }
+
+    public void setQuantum(int quantum) {
+        this.quantum = quantum;
     }
     
-    public void execute(){
-        sortProcessesList();
-        
-        while(this.finishedStack.size() != this.listSize){
-            addNewProcess();
-            runCPU();
+    
+
+    public String generar() {
+        //Suma de los tiempos de rafaga de cada Proceso 
+        for (int i = 0; i < cola.size(); i++) {
+            process = (Proceso)cola.get(i);
+            i += process.getRafaga();
         }
+        getQuantum();
+        //---------------------------------------------
         
-        printFinishedStack();
-        printTimer();
-    }
-    
-    
-    //Valida procesos entrantes y los agrega a la pila de listos si no son nulos.
-    private void addNewProcess(){
-        Proceso process = getProcessComing();
         
-        if(process!=null){
-            this.readyStack.push(process);
-        }
-    }
-    
-    private void runCPU(){
-        
-        Queue queueProcess = new LinkedList();
-        
-        if(!this.isCPURunning){
-            queueProcess.add(this.currentProcess);
-            if(this.quantum == 8){
-                this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
-                queueProcess.remove();
-                queueProcess.add(this.currentProcess);
-                this.isCPURunning = true;
-                this.quantum = 0;
-            }
-            
-        }else{
-            this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());
-            
-            double dinamicRafaja = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
-        
-            if(this.currentProcess.getRafaga() == dinamicRafaja){
-                this.finishedStack.push(this.currentProcess);
-                this.isCPURunning = false;
-                this.timer--;
-            }
-            
-            this.quantum++;
-            this.timer++;
-            
-            
-        }
-        
-    }
-    
-    
-    //Verifica si ha llegado un nuevo proceso.
-    private Proceso getProcessComing(){
-        Proceso process = null;
-        for(int i=0;i<this.processesList.size();i++){
-            if(this.processesList.get(i).getTiempoLlegada() == this.timer){
-                process = this.processesList.get(i);
-                this.processesList.remove(i);
-                break;
-            }
-        }
-        return process;
-    }
-    
-    private void sortProcessesList(){
-        Proceso buffer;
-        int i,j;
-        for(i = 0; i < processesList.size(); i++){
-            for(j = 0; j < i; j++){
-                if(processesList.get(i).getTiempoLlegada() < processesList.get(j).getTiempoLlegada())
-                {
-                    buffer = processesList.get(j);
-                    processesList.set(j, processesList.get(i));
-                    processesList.set(i, buffer);
+        //--Declaraciones---
+        String cadena = "";
+        int contador = 0;
+        double aux;
+        int suma_tiempo = 0;
+        boolean flag = true;
+        //------------------
+
+        //----------Programa-----------
+        while (flag) {
+
+            aux = process.getRafaga();
+
+            if (aux > 0) {
+
+                if (aux >= getQuantum()) {
+                    process.setRafaga(aux - getQuantum());
+                    suma_tiempo += getQuantum();
+                    cadena += "|" + process.getNombre() + "| t" + suma_tiempo + " n";
+                } else {
+                    process.setRafaga(0);
+                    suma_tiempo += aux;
+                    cadena += "|" + process.getNombre() + "| t" + suma_tiempo + " n";
                 }
             }
-        }      
-    }
-    
-    private void printFinishedStack(){
-        int limit = this.finishedStack.size();
-        for(int i=0;i<limit;i++){
-            Proceso proceso = (Proceso)this.finishedStack.pop();
-            System.out.println(proceso.toString());
+            
+            //identifica si hay mas procesos por terminar 
+            contador++;
+            if (contador < cola.size()) {
+                process = (Proceso) cola.get(contador);
+                flag = find();
+            } else {
+                contador = 0;
+                process = (Proceso) cola.get(contador);
+                flag = find();
+            }
+
         }
+        return cadena + "El tiempo fue: " + suma_tiempo;
     }
+
     
-    private void printTimer(){
-        System.out.println("El tiempo total de ejecución es: " + this.timer);
+    
+    private boolean find()//encuentra procesos restantes 
+    {
+        Proceso p;
+        boolean f = false;
+        for (int i = 0; i < cola.size(); i++) {
+            p = (Proceso) cola.get(i);
+            if (p.getRafaga() > 0) {
+                f = true;
+                break;
+            }
+
+        }
+        return f;
     }
-    
+
 }
