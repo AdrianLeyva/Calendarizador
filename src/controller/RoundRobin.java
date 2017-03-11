@@ -21,8 +21,9 @@ class RoundRobin {
     private Proceso currentProcess;
     private int listSize;
     private int timer;
+    private int quantum;
     
-    public RoundRobin(ArrayList<Proceso> processesList) {
+    public RoundRobin(ArrayList<Proceso> processesList, int quantum) {
         this.processesList = processesList;
         this.isCPURunning = false;
         this.readyStack = new Stack();
@@ -30,6 +31,7 @@ class RoundRobin {
         this.currentProcess = null;
         this.listSize = this.processesList.size();
         this.timer = 0;
+        this.quantum = quantum;
     }
     
     public void execute(){
@@ -56,6 +58,7 @@ class RoundRobin {
     
     private void runCPU(){
         if(!this.isCPURunning){
+            quantumVerification();
             this.currentProcess = (Proceso)this.readyStack.firstElement();
             this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
             this.readyStack.remove(0);
@@ -63,9 +66,9 @@ class RoundRobin {
         }else{
             this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());
             
-            double dinamicRafaja = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
+            double dinamicRafaga = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
         
-            if(this.currentProcess.getRafaga() == dinamicRafaja){
+            if(this.currentProcess.getRafaga() == dinamicRafaga){
                 this.finishedStack.push(this.currentProcess);
                 this.isCPURunning = false;
                 this.timer--;
@@ -73,10 +76,22 @@ class RoundRobin {
             
             
             this.timer++;
+            this.quantum++;
             
             
         }
         
+    }
+    
+    
+    private void quantumVerification(){
+        if(this.timer == this.quantum){
+            this.currentProcess = (Proceso)this.readyStack.firstElement();
+            this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
+            this.readyStack.remove(0);
+            this.isCPURunning = true;
+            this.quantum = 0;
+        }
     }
     
     
