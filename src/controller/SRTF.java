@@ -4,50 +4,35 @@
  * and open the template in the editor.
  */
 package controller;
-import java.util.*;
-import model.*;
 
+import java.util.ArrayList;
+import java.util.Stack;
+import model.Proceso;
 
 /**
  *
- * @author Armando Carvajal
+ * @author b1796
  */
-public class RoundRobin {
+public class SRTF {
     private ArrayList<Proceso> processesList;
     private boolean isCPURunning;
-    private Queue readyStack;
-    private Queue finishedStack;
+    private Stack readyStack;
+    private Stack finishedStack;
     private Proceso currentProcess;
     private int listSize;
     private int timer;
-    private int quantum;
-    private int counterQuantum;
     
-    public RoundRobin(ArrayList<Proceso> processesList, int quantum) {
+    public SRTF(ArrayList<Proceso> processesList) {
         this.processesList = processesList;
         this.isCPURunning = false;
-        this.readyStack = new LinkedList();
-        this.finishedStack = new LinkedList();
+        this.readyStack = new Stack();
+        this.finishedStack = new Stack();
         this.currentProcess = null;
         this.listSize = this.processesList.size();
         this.timer = 0;
-        this.quantum = quantum;
-        this.counterQuantum = 0;
     }
-
-    public int getQuantum() {
-        return quantum;
-    }
-
-    public void setQuantum(int quantum) {
-        this.quantum = quantum;
-    }
-    
-    
     
     public void execute(){
-        sortProcessesList();
-        
         while(this.finishedStack.size() != this.listSize){
             addNewProcess();
             runCPU();
@@ -63,32 +48,46 @@ public class RoundRobin {
         Proceso process = getProcessComing();
         
         if(process!=null){
-            this.readyStack.add(process);
+            process = verificarDP(process);
+            this.readyStack.push(process);
         }
     }
     
     private void runCPU(){
         if(!this.isCPURunning){
-            this.currentProcess = (Proceso)this.readyStack.element();
+            sortReadyStack();
+            this.currentProcess = (Proceso)this.readyStack.firstElement();
             this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
-            this.readyStack.poll();
+            this.readyStack.remove(0);
             this.isCPURunning = true;
         }else{
             this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());
-            
-            double dinamicRafaja = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
+            double dinamicRafaga = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
+            this.currentProcess.setTiempoRestante(this.currentProcess.getRafaga() - dinamicRafaga);
         
-            if(this.currentProcess.getRafaga() == dinamicRafaja){
-                this.finishedStack.add(this.currentProcess);
+            if(this.currentProcess.getRafaga() == dinamicRafaga){
+                this.finishedStack.push(this.currentProcess);
                 this.isCPURunning = false;
                 this.timer--;
-            }            
+            }
             
             this.timer++;
-            counterQuantum++;
-                    
+            
         }
         
+    }
+    
+    //Verifica si un proceso nuevo encontrado tiene preferencia al que se esté ejecutando en ese momento
+    private Proceso verificarDP(Proceso p){
+        if(this.currentProcess != null){
+            Proceso temp = this.currentProcess;
+            if(p.getRafaga() < this.currentProcess.getTiempoRestante()){
+                this.currentProcess = p;
+                return temp;
+            }else
+                return p;
+        }else
+            return p;
     }
     
     
@@ -105,25 +104,26 @@ public class RoundRobin {
         return process;
     }
     
-    private void sortProcessesList(){
+    private void sortReadyStack(){
+        
         Proceso buffer;
         int i,j;
-        for(i = 0; i < processesList.size(); i++){
+        for(i = 0; i < readyStack.size(); i++){
             for(j = 0; j < i; j++){
-                if(processesList.get(i).getTiempoLlegada() < processesList.get(j).getTiempoLlegada())
+                if(((Proceso)readyStack.get(i)).getTiempoRestante() < ((Proceso)readyStack.get(j)).getTiempoRestante())
                 {
-                    buffer = processesList.get(j);
-                    processesList.set(j, processesList.get(i));
-                    processesList.set(i, buffer);
+                    buffer = (Proceso)readyStack.get(j);
+                    readyStack.set(j, readyStack.get(i));
+                    readyStack.set(i, buffer);
                 }
             }
-        }      
+        }     
     }
     
     private void printFinishedStack(){
         int limit = this.finishedStack.size();
         for(int i=0;i<limit;i++){
-            Proceso proceso = (Proceso)this.finishedStack.poll();
+            Proceso proceso = (Proceso)this.finishedStack.pop();
             System.out.println(proceso.toString());
         }
     }
@@ -131,5 +131,4 @@ public class RoundRobin {
     private void printTimer(){
         System.out.println("El tiempo total de ejecución es: " + this.timer);
     }
-    
 }

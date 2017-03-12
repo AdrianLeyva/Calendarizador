@@ -24,6 +24,6 @@ public class Main {
         arrayList.add(new Proceso("proceso5",16,3,0,"activo"));
         
         calend = new Calendarizador(arrayList);
-        calend.executeSJF();
+        calend.executeSRTF();
     }
 }
