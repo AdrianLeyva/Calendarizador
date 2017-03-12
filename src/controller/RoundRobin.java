@@ -15,8 +15,8 @@ import model.*;
 public class RoundRobin {
     private ArrayList<Proceso> processesList;
     private boolean isCPURunning;
-    private Queue readyStack;
-    private Queue finishedStack;
+    private Queue readyQueue;
+    private Queue finishedQueue;
     private Proceso currentProcess;
     private int listSize;
     private int timer;
@@ -26,8 +26,8 @@ public class RoundRobin {
     public RoundRobin(ArrayList<Proceso> processesList, int quantum) {
         this.processesList = processesList;
         this.isCPURunning = false;
-        this.readyStack = new LinkedList();
-        this.finishedStack = new LinkedList();
+        this.readyQueue = new LinkedList();
+        this.finishedQueue = new LinkedList();
         this.currentProcess = null;
         this.listSize = this.processesList.size();
         this.timer = 0;
@@ -41,14 +41,12 @@ public class RoundRobin {
 
     public void setQuantum(int quantum) {
         this.quantum = quantum;
-    }
-    
-    
+    }   
     
     public void execute(){
         sortProcessesList();
         
-        while(this.finishedStack.size() != this.listSize){
+        while(this.finishedQueue.size() != this.listSize){
             addNewProcess();
             runCPU();
         }
@@ -63,32 +61,45 @@ public class RoundRobin {
         Proceso process = getProcessComing();
         
         if(process!=null){
-            this.readyStack.add(process);
+            this.readyQueue.add(process);
         }
     }
     
-    private void runCPU(){
-        if(!this.isCPURunning){
-            this.currentProcess = (Proceso)this.readyStack.element();
+    private void runCPU(){    
+       if(!this.isCPURunning){      
+            this.currentProcess = (Proceso)this.readyQueue.element();
             this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
-            this.readyStack.poll();
-            this.isCPURunning = true;
-        }else{
-            this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());
+            this.readyQueue.poll();
+            this.isCPURunning = true;    
+        }else{                
+                     
+           if (this.counterQuantum == getQuantum()) {
+               quantumChange();                          
+           } 
+           
+            this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());           
+            double dinamicRafaja = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());   
             
-            double dinamicRafaja = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
-        
             if(this.currentProcess.getRafaga() == dinamicRafaja){
-                this.finishedStack.add(this.currentProcess);
+                this.finishedQueue.add(this.currentProcess);
                 this.isCPURunning = false;
-                this.timer--;
-            }            
+                this.timer--;   
+                           }
+            
+            
             
             this.timer++;
-            counterQuantum++;
-                    
+            this.counterQuantum++;    
+            
+            
         }
-        
+    }
+      
+    private void quantumChange(){       
+            double dinamicRafaja = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
+            this.currentProcess.setTiempoRestante(this.currentProcess.getRafaga() - dinamicRafaja);
+            this.readyQueue.add(this.currentProcess); 
+            this.counterQuantum = 1;
     }
     
     
@@ -121,9 +132,9 @@ public class RoundRobin {
     }
     
     private void printFinishedStack(){
-        int limit = this.finishedStack.size();
+        int limit = this.finishedQueue.size();
         for(int i=0;i<limit;i++){
-            Proceso proceso = (Proceso)this.finishedStack.poll();
+            Proceso proceso = (Proceso)this.finishedQueue.poll();
             System.out.println(proceso.toString());
         }
     }

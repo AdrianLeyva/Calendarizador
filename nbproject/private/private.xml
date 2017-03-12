@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
@@ -7,3 +8,19 @@
         </group>
     </open-files>
 </project-private>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/D:/Escritorio/SO/SO/src/controller/SRTF.java</file>
+            <file>file:/D:/Escritorio/SO/SO/src/controller/Calendarizador.java</file>
+            <file>file:/D:/Escritorio/SO/SO/src/controller/FCFS.java</file>
+            <file>file:/D:/Escritorio/SO/SO/src/model/Proceso.java</file>
+            <file>file:/D:/Escritorio/SO/SO/src/controller/RoundRobin.java</file>
+            <file>file:/D:/Escritorio/SO/SO/src/test/Main.java</file>
+        </group>
+    </open-files>
+</project-private>
+>>>>>>> 7491e5bbae5a9f4170e2e572da7e37b829455215
