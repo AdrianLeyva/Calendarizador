@@ -34,9 +34,15 @@ public class Calendarizador {
         srtf.execute();
     }
     
-    public void executeRoundRobin(int quantum){
-        RoundRobin rr = new RoundRobin(lista, quantum);
+    public void executeRR(){
+        RoundRobin rr = new RoundRobin(lista, 8);
         rr.execute();
     }
     
+    public void executePrioridad(){
+        Prioridad prio = new Prioridad(lista);
+        prio.execute();
+        
+    }
 }
+

@@ -41,6 +41,8 @@ public class SJF {
         
         printFinishedStack();
         printTimer();
+        printTEP();
+        printTTP();
     }
     
     
@@ -110,11 +112,37 @@ public class SJF {
     }
     
     private void printFinishedStack(){
+        System.out.println("Pila de procesos finalizados\n");
         int limit = this.finishedStack.size();
         for(int i=0;i<limit;i++){
-            Proceso proceso = (Proceso)this.finishedStack.pop();
+            Proceso proceso = (Proceso)this.finishedStack.get(i);
             System.out.println(proceso.toString());
         }
+    }
+    
+    //Imprime tiempo espera promedio
+    private void printTEP(){
+        double time = 0;
+        double average = 0;
+        for(int i=0;i<this.finishedStack.size();i++){
+            time = time + ((Proceso)this.finishedStack.get(i)).getTiempoEspera();
+        }
+        average = time/this.finishedStack.size();
+        
+        System.out.println("El tiempo de espera promedio es: " + average);
+        
+    }
+    
+    //Imprime tiempo total promedio
+    private void printTTP(){
+        double time = 0;
+        double average = 0;
+        for(int i=0;i<this.finishedStack.size();i++){
+            time = time + ((Proceso)this.finishedStack.get(i)).getTiempoTotal();
+        }
+        average = time/this.finishedStack.size();
+        
+        System.out.println("El tiempo total promedio es: " + average);
     }
     
     private void printTimer(){

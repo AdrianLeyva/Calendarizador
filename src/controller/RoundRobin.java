@@ -53,6 +53,8 @@ public class RoundRobin {
         
         printFinishedStack();
         printTimer();
+        printTEP();
+        printTTP();
     }
     
     
@@ -131,10 +133,40 @@ public class RoundRobin {
         }      
     }
     
+    //Imprime tiempo espera promedio
+    private void printTEP(){
+        Object[] processes = this.finishedQueue.toArray();
+        double time = 0;
+        double average = 0;
+        for(int i=0;i<processes.length;i++){
+            time = time + ((Proceso)processes[i]).getTiempoEspera();
+        }
+        average = time/processes.length;
+        
+        System.out.println("El tiempo de espera promedio es: " + average);
+        
+    }
+    
+    //Imprime tiempo total promedio
+    private void printTTP(){
+        Object[] processes = this.finishedQueue.toArray();
+        double time = 0;
+        double average = 0;
+        for(int i=0;i<processes.length;i++){
+            time = time + ((Proceso)processes[i]).getTiempoTotal();
+        }
+        average = time/processes.length;
+        
+        System.out.println("El tiempo total promedio es: " + average);
+    }
+    
+    
     private void printFinishedStack(){
-        int limit = this.finishedQueue.size();
+        System.out.println("Pila de procesos finalizados\n");
+        Object[] processes = this.finishedQueue.toArray();
+        int limit = processes.length;
         for(int i=0;i<limit;i++){
-            Proceso proceso = (Proceso)this.finishedQueue.poll();
+            Proceso proceso = ((Proceso)processes[i]);
             System.out.println(proceso.toString());
         }
     }
