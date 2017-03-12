@@ -33,5 +33,9 @@ public class Calendarizador {
         SRTF srtf = new SRTF(lista);
         srtf.execute();
     }
-    
+    public void executePrioridad(){
+        Prioridad prio = new Prioridad(lista);
+        prio.execute();
+        
+    }
 }
