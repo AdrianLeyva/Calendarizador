@@ -41,9 +41,7 @@ public class RoundRobin {
 
     public void setQuantum(int quantum) {
         this.quantum = quantum;
-    }
-    
-    
+    }   
     
     public void execute(){
         sortProcessesList();
@@ -67,38 +65,41 @@ public class RoundRobin {
         }
     }
     
-    private void runCPU(){
-        if(!this.isCPURunning){
+    private void runCPU(){    
+       if(!this.isCPURunning){      
             this.currentProcess = (Proceso)this.readyQueue.element();
             this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
             this.readyQueue.poll();
-            this.isCPURunning = true;
-        }else{
-            if (counterQuantum == getQuantum()) {
-                quantumChange();
-                this.counterQuantum = 0;
-            }else{
-            this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());            
-            double dinamicRafaga = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());        
-            if(this.currentProcess.getRafaga() == dinamicRafaga){
+            this.isCPURunning = true;    
+        }else{                
+                     
+           if (this.counterQuantum == getQuantum()) {
+               quantumChange();                          
+           } 
+           
+            this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());           
+            double dinamicRafaja = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());   
+            
+            if(this.currentProcess.getRafaga() == dinamicRafaja){
                 this.finishedQueue.add(this.currentProcess);
                 this.isCPURunning = false;
-                this.timer--;
-            }            
+                this.timer--;   
+                           }
+            
+            
             
             this.timer++;
-            this.counterQuantum++;
-            }        
+            this.counterQuantum++;    
+            
+            
         }
-        
     }
-    
-    
-    private void quantumChange(){
-            this.readyQueue.poll();
-            this.currentProcess.setRafaga(this.currentProcess.getRafaga() - this.counterQuantum);
-            this.currentProcess.setTiempoEspera(this.currentProcess.getTiempoEspera() + this.quantum);
-            this.readyQueue.add(this.currentProcess);
+      
+    private void quantumChange(){       
+            double dinamicRafaja = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
+            this.currentProcess.setTiempoRestante(this.currentProcess.getRafaga() - dinamicRafaja);
+            this.readyQueue.add(this.currentProcess); 
+            this.counterQuantum = 1;
     }
     
     
