@@ -111,8 +111,4 @@ public class Proceso {
     public String toString() {
         return "Proceso[" + "nombre = " + nombre + " | tiempoLlegada = " + tiempoLlegada + " | rafaga = " + rafaga + " | prioridad = " + prioridad + " | tiempoEspera = " + tiempoEspera + " | tiempoTotal = " + tiempoTotal + " | estado = " + estado + "]";
     }
-    
-    
-    
-    
 }
