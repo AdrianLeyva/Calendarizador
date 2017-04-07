@@ -20,6 +20,7 @@ public class Proceso {
     private double tiempoEspera;
     private double tiempoTotal;
     private double tiempoRestante;
+    private double tiempoUtilizado;
     private String estado;
 
     public Proceso(String nombre, double tiempoLlegada, double rafaga, int prioridad, String estado) {
@@ -31,6 +32,7 @@ public class Proceso {
         this.tiempoEspera = 0;
         this.tiempoTotal = 0;
         this.tiempoRestante = this.rafaga;
+        this.tiempoUtilizado = 0;
     }
 
     public String getNombre() {
@@ -97,9 +99,17 @@ public class Proceso {
         this.tiempoRestante = tiempoRestante;
     }
 
+    public double getTiempoUtilizado() {
+        return tiempoUtilizado;
+    }
+
+    public void setTiempoUtilizado(double tiempoUtilizado) {
+        this.tiempoUtilizado = tiempoUtilizado;
+    }
+
     @Override
     public String toString() {
-        return "Proceso{" + "nombre=" + nombre + ", tiempoLlegada=" + tiempoLlegada + ", rafaga=" + rafaga + ", prioridad=" + prioridad + ", tiempoEspera=" + tiempoEspera + ", tiempoTotal=" + tiempoTotal + ", estado=" + estado + '}';
+        return "Proceso[" + "nombre = " + nombre + " | tiempoLlegada = " + tiempoLlegada + " | rafaga = " + rafaga + " | prioridad = " + prioridad + " | tiempoEspera = " + tiempoEspera + " | tiempoTotal = " + tiempoTotal + " | estado = " + estado + "]";
     }
     
     

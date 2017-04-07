@@ -6,6 +6,8 @@
 package controller;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 import model.Proceso;
 
@@ -16,29 +18,31 @@ import model.Proceso;
 public class SRTF {
     private ArrayList<Proceso> processesList;
     private boolean isCPURunning;
-    private Stack readyStack;
-    private Stack finishedStack;
+    private boolean band;
     private Proceso currentProcess;
     private int listSize;
     private int timer;
+    private Queue readyQueue;
+    private Queue finishedQueue;
     
     public SRTF(ArrayList<Proceso> processesList) {
         this.processesList = processesList;
         this.isCPURunning = false;
-        this.readyStack = new Stack();
-        this.finishedStack = new Stack();
+        this.band = false;
+        this.readyQueue = new LinkedList();
+        this.finishedQueue = new LinkedList();
         this.currentProcess = null;
         this.listSize = this.processesList.size();
         this.timer = 0;
     }
     
     public void execute(){
-        while(this.finishedStack.size() != this.listSize){
+        while(this.finishedQueue.size() != this.listSize){
             addNewProcess();
             runCPU();
         }
         
-        printFinishedStack();
+        printFinishedQueue();
         printTimer();
     }
     
@@ -49,32 +53,42 @@ public class SRTF {
         
         if(process!=null){
             process = verificarDP(process);
-            this.readyStack.push(process);
+            this.readyQueue.add(process);
+            System.out.println(" > Cola de listos: " + process.toString());
         }
     }
     
     private void runCPU(){
         if(!this.isCPURunning){
-            sortReadyStack();
-            this.currentProcess = (Proceso)this.readyStack.firstElement();
-            this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada());
-            this.readyStack.remove(0);
+            this.currentProcess = (Proceso)this.readyQueue.poll();
+            this.currentProcess.setTiempoEspera(this.timer - this.currentProcess.getTiempoLlegada() 
+                    - this.currentProcess.getTiempoUtilizado());
             this.isCPURunning = true;
+            if (band) {
+                System.out.println("\n--------------Finalizo un proceso e inicio otro-------------\n");
+            } else {
+                System.out.println("------------------------------Inicio-----------------------------");
+                band = true;
+            }
         }else{
-            this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());
-            double dinamicRafaga = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
-            this.currentProcess.setTiempoRestante(this.currentProcess.getRafaga() - dinamicRafaga);
-        
+            double dinamicRafaga = modificarCurrentProcess();
             if(this.currentProcess.getRafaga() == dinamicRafaga){
-                this.finishedStack.push(this.currentProcess);
+                this.finishedQueue.add(this.currentProcess);
                 this.isCPURunning = false;
                 this.timer--;
             }
-            
             this.timer++;
             
         }
         
+    }
+    private double modificarCurrentProcess(){
+        this.currentProcess.setTiempoTotal(this.timer - this.currentProcess.getTiempoLlegada());
+        double dinamicRafaga = (this.currentProcess.getTiempoTotal() - this.currentProcess.getTiempoEspera());
+        this.currentProcess.setTiempoRestante(this.currentProcess.getRafaga() - dinamicRafaga);
+        this.currentProcess.setTiempoUtilizado(dinamicRafaga);
+        System.out.println("Proceso en ejecucion: " + this.currentProcess.toString() + " | Timer = " + this.timer);
+        return dinamicRafaga;
     }
     
     //Verifica si un proceso nuevo encontrado tiene preferencia al que se esté ejecutando en ese momento
@@ -82,6 +96,9 @@ public class SRTF {
         if(this.currentProcess != null){
             Proceso temp = this.currentProcess;
             if(p.getRafaga() < this.currentProcess.getTiempoRestante()){
+                modificarCurrentProcess();
+                System.out.println("\n--------------------Interrupcion------------------\n");
+                //this.timer --;
                 this.currentProcess = p;
                 return temp;
             }else
@@ -104,26 +121,11 @@ public class SRTF {
         return process;
     }
     
-    private void sortReadyStack(){
-        
-        Proceso buffer;
-        int i,j;
-        for(i = 0; i < readyStack.size(); i++){
-            for(j = 0; j < i; j++){
-                if(((Proceso)readyStack.get(i)).getTiempoRestante() < ((Proceso)readyStack.get(j)).getTiempoRestante())
-                {
-                    buffer = (Proceso)readyStack.get(j);
-                    readyStack.set(j, readyStack.get(i));
-                    readyStack.set(i, buffer);
-                }
-            }
-        }     
-    }
-    
-    private void printFinishedStack(){
-        int limit = this.finishedStack.size();
+    private void printFinishedQueue(){
+        System.out.println("\n\n\nProcesos Finalizados");
+        int limit = this.finishedQueue.size();
         for(int i=0;i<limit;i++){
-            Proceso proceso = (Proceso)this.finishedStack.pop();
+            Proceso proceso = (Proceso)this.finishedQueue.poll();
             System.out.println(proceso.toString());
         }
     }
